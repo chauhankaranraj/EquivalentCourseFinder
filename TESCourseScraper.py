@@ -1,0 +1,76 @@
+import pickle as pkl
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+
+
+# load previous page results, if any
+try:
+	results = pkl.load(open("results.pkl", "rb"))
+except:
+	results = []
+
+
+# target metadata and selectors
+target_course = "CAS WR 150"
+target_url = "https://tes.collegesource.com/view/tes_view01.asp?rid=%7BF3C0908C-8809-4592-A06A-2EC9C2C3ACC8%7D&aid=%7BADBAA968-6CE9-47A6-9B99-43D30CDD2D67%7D"
+next_page_xpath = "//*[contains(concat( \" \", @class, \" \" ), concat( \" \", \"bodysmall\", \" \" ))]//*[contains(concat( \" \", @class, \" \" ), concat( \" \", \"bodysmall\", \" \" ))]//*[contains(concat( \" \", @class, \" \" ), concat( \" \", \"bodysmall\", \" \" ))]//a"
+colleges_xpath = "//*[contains(concat( \" \", @class, \" \" ), concat( \" \", \"pageheader\", \" \" ))]//a"
+course_code_xpath = "//*[(@id = \"coursecode\")]"
+code_type_xpath = ".//input[@type=\"radio\" and @value=\"2\"]"
+course_match_xpath = "//td//*[contains(concat( \" \", @class, \" \" ), concat( \" \", \"bodysmall\", \" \" ))]//*[contains(concat( \" \", @class, \" \" ), concat( \" \", \"bodysmaller\", \" \" ))]"
+college_state_xpath = "//font"
+
+
+# init chrome driver
+chromedriver_path = "/Users/karanraj/Downloads/chromedriver"
+driver = webdriver.Chrome(chromedriver_path)
+driver.get(target_url)
+
+
+# number of pages of list of colleges
+num_pages = 32
+
+# scan colleges on all pages one by one
+for _ in range(num_pages-1):
+
+	# all colleges in current page and their states
+	num_colleges = len(driver.find_elements_by_xpath(colleges_xpath))
+
+	# scan colleges on current page
+	for i in range(num_colleges):
+
+		# get college metadata then go to the college courses page
+		college = driver.find_elements_by_xpath(colleges_xpath)[i]
+		college_name = college.text
+		college_loc = driver.find_elements_by_xpath(college_state_xpath)[i].text
+		college.send_keys(Keys.ENTER)
+
+		# course code type - away, home, both. select home
+		driver.find_element_by_xpath(code_type_xpath).click()
+
+		# course code search box. enter target home course name
+		search_box = driver.find_element_by_xpath(course_code_xpath)
+		search_box.send_keys(target_course)
+		search_box.send_keys(Keys.ENTER)
+
+		# check if there are any matches
+		is_match = driver.find_elements_by_xpath(course_match_xpath)
+
+		if is_match:
+			print("found a match")
+			# get name of course at the other college
+			results.append({"name": college_name, "location": college_loc})
+
+		# click back two times to get back to college list
+		driver.back()
+		driver.back()
+
+	# go to next page of list of colleges
+	driver.find_elements_by_xpath(next_page_xpath)[-1].click()
+
+
+# save data from current search
+pkl.dump(results, open("results.pkl", "wb"))
+
+# exit
+driver.close()
