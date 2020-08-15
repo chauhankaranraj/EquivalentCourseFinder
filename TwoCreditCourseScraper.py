@@ -6,9 +6,9 @@ filename = "twocred.pkl"
 
 # load previous page results, if any
 try:
-	results = pkl.load(open(filename, "rb"))
+    results = pkl.load(open(filename, "rb"))
 except:
-	results = []
+    results = []
 
 
 # target metadata and selectors
@@ -37,21 +37,21 @@ num_pages = 1000
 # scan colleges on all pages one by one
 for _ in range(num_pages-1):
 
-	# courses on current page
-	curr_page_courses = driver.find_elements_by_xpath(courses_xpath)
+    # courses on current page
+    curr_page_courses = driver.find_elements_by_xpath(courses_xpath)
 
-	# credits for courses on current page
-	curr_page_credits = driver.find_elements_by_xpath(credits_xpath)
+    # credits for courses on current page
+    curr_page_credits = driver.find_elements_by_xpath(credits_xpath)
 
-	# check for matches
-	for i in range(len(curr_page_credits)):
-		print(curr_page_credits[i].text)
-		if curr_page_credits[i].text == "2.0":
-			results.append(curr_page_courses[i].text)
-			print(curr_page_courses[i].text)
+    # check for matches
+    for i in range(len(curr_page_credits)):
+        print(curr_page_credits[i].text)
+        if curr_page_credits[i].text == "2.0":
+            results.append(curr_page_courses[i].text)
+            print(curr_page_courses[i].text)
 
-	# go to next page
-	driver.find_elements_by_xpath(next_page_xpath)[-1].click()
+    # go to next page
+    driver.find_elements_by_xpath(next_page_xpath)[-1].click()
 
 # save data from current search
 pkl.dump(results, open(filename, "wb"))
