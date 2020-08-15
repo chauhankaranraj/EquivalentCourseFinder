@@ -124,24 +124,19 @@ for page_num in range(args.num_pages-1):
 
         # set effective date according to input
         if args.effective_date == 'active':
-            search_course_effective_date = driver.find_element_by_xpath(SEARCH_POPUP_EFF_DATE_ACTIVE_XP)
+            search_course_effective_date = driver.find_element_by_xpath(SEARCH_POPUP_EFF_DATE_ACTIVE_XP).click()
         elif args.effective_date == 'inactive':
-            search_course_effective_date = driver.find_element_by_xpath(SEARCH_POPUP_EFF_DATE_INACTIVE_XP)
+            search_course_effective_date = driver.find_element_by_xpath(SEARCH_POPUP_EFF_DATE_INACTIVE_XP).click()
         elif args.effective_date == 'both':
-            search_course_effective_date = driver.find_element_by_xpath(SEARCH_POPUP_EFF_DATE_BOTH_XP)
-        search_course_effective_date.send_keys(Keys.ENTER)
-        search_course_effective_date.send_keys(Keys.SPACE)
+            search_course_effective_date = driver.find_element_by_xpath(SEARCH_POPUP_EFF_DATE_BOTH_XP).click()
 
         # set search settings to search for "home" or  "away" or both
         if args.course_type == 'home':
-            search_course_type = driver.find_element_by_xpath(SEARCH_POPUP_COURSETYPE_HOME_XP)
+            search_course_type = driver.find_element_by_xpath(SEARCH_POPUP_COURSETYPE_HOME_XP).click()
         elif args.course_type == 'away':
-            search_course_type = driver.find_element_by_xpath(SEARCH_POPUP_COURSETYPE_AWAY_XP)
+            search_course_type = driver.find_element_by_xpath(SEARCH_POPUP_COURSETYPE_AWAY_XP).click()
         elif args.course_type == 'both':
-            search_course_type = driver.find_element_by_xpath(SEARCH_POPUP_COURSETYPE_BOTH_XP)
-        # search_course_type = driver.find_element_by_xpath('//*[(@id = "rblCourseCodeType_1")]')
-        search_course_type.send_keys(Keys.ENTER)
-        search_course_type.send_keys(Keys.SPACE)
+            search_course_type = driver.find_element_by_xpath(SEARCH_POPUP_COURSETYPE_BOTH_XP).click()
 
         # course code search box. enter target home course name
         search_button = driver.find_element_by_xpath(SEARCH_POPUP_SEARCH_BUTTON_XP)
