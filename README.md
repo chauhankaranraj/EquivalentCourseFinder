@@ -4,6 +4,8 @@ This repo contains python scripts to scrape some web pages at Boston University.
 
 Of course, this problem could have been solved by having a better website, but that doesn't seem to have happened in >2 years. I have recently found other people would find this script helpful, so I'm open sourcing it.
 
+**Disclaimer** This was a purely personal "project" I put together over a weekend, two years ago. It is not certified or supported by any colleges in any way. I do not claim this to be 100% accurate. Please talk to your academic advisor before taking any courses.
+
 ## Installation
 
 1. Download `chromedriver` from their [downloads](https://chromedriver.chromium.org/downloads) page.
