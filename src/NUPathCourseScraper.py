@@ -1,7 +1,11 @@
-import time
 import argparse
 import pickle as pkl
+import os.path as osp
+import datetime as dt
 from tqdm import tqdm
+
+import pandas as pd
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -37,10 +41,16 @@ def parse_scrape_args():
     )
     parser.add_argument(
         '--save-fname',
-        default=f'../reports/results_{time.time()}.pkl',
+        default=f'../reports/results_{dt.datetime.now().strftime("%b-%d-%Y-%H-%M-%S")}.pkl',
         type=str,
         required=False,
         help='Path + filename where results pickle should be stored',
+    )
+    parser.add_argument(
+        '--college-keyword',
+        type=str,
+        required=False,
+        help="Will search only colleges which contain the keyword specified in this arg. CASE SENSITIVE",
     )
 
     return parser.parse_args()
@@ -73,10 +83,13 @@ college_names = []
 for c in tqdm(college_dropdown_opts):
     college_names.append(c.text)
     
-# with open('college_names.pkl', 'wb') as f:
+# with open('../reports/college_names.pkl', 'wb') as f:
 #     pkl.dump(college_names, f)
-# with open('../college_names.pkl', 'rb') as f:
+# with open('../reports/college_names.pkl', 'rb') as f:
 #     college_names = pkl.load(f)
+
+# split save fname into head and tail
+head_fname, tail_fname = osp.split(args.save_fname)
 
 # list of dictionaries, each dictionary contains details of a match
 results = []
@@ -84,6 +97,12 @@ results = []
 # iterate through all colleges and see if NUPath contains *all* of the matching paths
 # NOTE: skip the first one since its an empty string
 for ci in range(1, len(college_names)):
+    
+    # if college_keyword argument is specified then search only those colleges which
+    # match the input keyword
+    if args.college_keyword is not None and args.college_keyword not in college_names[ci]:
+        continue
+
     colleges_dropdown = Select(driver.find_element_by_xpath(INSTITUTES_DRPDWN_XP))
     
     # click on college
@@ -127,6 +146,11 @@ for ci in range(1, len(college_names)):
     # save data every iteration, in case it gets stopped in the middle
     with open(args.save_fname, "wb") as f:
         pkl.dump(results, f)
+
+    # save as excel, so users can see results directly
+    pd.DataFrame(results).to_excel(
+        osp.join(head_fname, tail_fname.rsplit('.', 1)[0] + '.xlsx')
+    )
 
 # exit
 driver.close()
